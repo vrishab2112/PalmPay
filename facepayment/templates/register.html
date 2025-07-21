@@ -1,0 +1,708 @@
+{% extends "layout.html" %}
+
+{% block title %}Register - PalmPay{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <!-- Header Section -->
+    <div class="register-header">
+        <div class="header-content">
+            <h1 class="main-title">
+                <i class="fas fa-hand-paper"></i>
+                Palm Registration
+            </h1>
+            <p class="header-subtitle">Secure your account with biometric authentication</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="register-content">
+        <div class="register-grid">
+            <!-- Left Panel - Instructions -->
+            <div class="instructions-panel">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-info-circle"></i> Registration Guide</h2>
+                    </div>
+                    <div class="steps-container">
+                        <div class="step-item">
+                            <div class="step-icon">
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                            <div class="step-content">
+                                <h3>Position Your Palm</h3>
+                                <p>Place your palm flat in front of the camera within the guide circle</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="step-content">
+                                <h3>Enter Your Name</h3>
+                                <p>Provide your full name for account identification</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div class="step-content">
+                                <h3>Capture & Register</h3>
+                                <p>Click capture when your palm is clearly visible and centered</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Camera & Form -->
+            <div class="camera-panel">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-camera"></i> Palm Capture</h2>
+                    </div>
+                    
+                    <!-- Camera Section -->
+                    <div class="camera-section">
+                        <div class="video-wrapper">
+                            <video id="videoElement" autoplay playsinline muted></video>
+                            <div class="camera-overlay">
+                                <div class="capture-guide">
+                                    <div class="guide-circle">
+                                        <i class="fas fa-hand-paper guide-icon"></i>
+                                    </div>
+                                    <div class="guide-text">Position palm here</div>
+                                </div>
+                            </div>
+                            <div class="camera-status">
+                                <div class="status-indicator" id="statusIndicator">
+                                    <i class="fas fa-circle"></i>
+                                    <span>Camera Ready</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Section -->
+                    <div class="form-section">
+                        <div class="button-group">
+                            <button id="captureButton" class="btn-capture" onclick="captureImage()">
+                                <i class="fas fa-camera"></i>
+                                <span>Capture Palm</span>
+                            </button>
+                            <button id="retakeButton" class="btn-retake" onclick="retakeImage()" style="display: none;">
+                                <i class="fas fa-redo"></i>
+                                <span>Retake</span>
+                            </button>
+                            <button id="registerButton" class="btn-register" onclick="registerUser()" style="display: none;">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Register User</span>
+                            </button>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" id="nameInput" placeholder="Enter your full name" required>
+                                <div class="input-focus-border"></div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fas fa-phone input-icon"></i>
+                                <input type="text" id="phoneInput" placeholder="Enter your phone number" required pattern="[0-9]{10}" style="width:100%; padding: 1rem 1rem 1rem 3rem; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 1rem; background: #f8f9fa;">
+                                <div class="input-focus-border"></div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="passwordInput" placeholder="Enter password" required minlength="6" style="width:100%; padding: 1rem 1rem 1rem 3rem; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 1rem; background: #f8f9fa;">
+                                <div class="input-focus-border"></div>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="confirmPasswordInput" placeholder="Confirm password" required minlength="6" style="width:100%; padding: 1rem 1rem 1rem 3rem; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 1rem; background: #f8f9fa;">
+                                <div class="input-focus-border"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div id="previewContainer" class="preview-section" style="display: none;">
+                        <div class="preview-header">
+                            <h3><i class="fas fa-eye"></i> Registration Preview</h3>
+                        </div>
+                        <div class="preview-content">
+                            <img id="previewImage" alt="Palm preview">
+                            <div class="preview-info">
+                                <p><strong>Name:</strong> <span id="previewName"></span></p>
+                                <p><strong>Status:</strong> <span id="previewStatus">Ready to register</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div id="loadingModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+        <h3>Processing Registration</h3>
+        <p>Please wait while we secure your palm data...</p>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content success-modal">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Registration Successful!</h3>
+        <p>Your palm has been registered successfully. You can now use PalmPay for secure transactions.</p>
+        <button class="btn-primary" onclick="window.location.href='/'">
+            <i class="fas fa-home"></i>
+            Go to Home
+        </button>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content error-modal">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <h3>Registration Failed</h3>
+        <p id="errorMessage">An error occurred during registration. Please try again.</p>
+        <button class="btn-primary" onclick="closeErrorModal()">
+            <i class="fas fa-times"></i>
+            Close
+        </button>
+    </div>
+</div>
+
+<style>
+/* Register Page Specific Styles */
+.register-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: white;
+}
+
+.main-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.main-title i {
+    margin-right: 1rem;
+    color: #ffd700;
+}
+
+.header-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.register-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.register-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Panel Cards */
+.panel-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+}
+
+.panel-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.panel-header i {
+    margin-right: 0.5rem;
+    color: #ffd700;
+}
+
+/* Instructions Panel */
+.instructions-panel {
+    height: fit-content;
+}
+
+.steps-container {
+    padding: 2rem;
+}
+
+.step-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.step-item:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: translateX(5px);
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.step-icon i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.step-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.step-content p {
+    margin: 0;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Camera Panel */
+.camera-panel .panel-card {
+    height: 100%;
+}
+
+.camera-section {
+    padding: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.video-wrapper {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 4/3;
+}
+
+#videoElement {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.capture-guide {
+    text-align: center;
+}
+
+.guide-circle {
+    width: 200px;
+    height: 200px;
+    border: 3px dashed rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.guide-icon {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.guide-text {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.camera-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.status-indicator i {
+    color: #4CAF50;
+    margin-right: 0.5rem;
+    animation: blink 1.5s infinite;
+}
+
+/* Form Section */
+.form-section {
+    padding: 2rem;
+}
+
+.input-group {
+    margin-bottom: 2rem;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    color: #667eea;
+    font-size: 1.2rem;
+    z-index: 2;
+}
+
+#nameInput {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+#nameInput:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-capture, .btn-retake, .btn-register {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 150px;
+    justify-content: center;
+}
+
+.btn-capture {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-capture:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-retake {
+    background: #f8f9fa;
+    color: #666;
+    border: 2px solid #e0e0e0;
+}
+
+.btn-retake:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.btn-register {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+}
+
+/* Preview Section */
+.preview-section {
+    padding: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.preview-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.preview-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.preview-content {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+#previewImage {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 15px;
+    border: 3px solid #667eea;
+}
+
+.preview-info {
+    flex: 1;
+}
+
+.preview-info p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: #666;
+}
+
+.preview-info strong {
+    color: #333;
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.loading-spinner {
+    margin-bottom: 2rem;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+.success-modal .success-icon {
+    font-size: 4rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.error-modal .error-icon {
+    font-size: 4rem;
+    color: #f44336;
+    margin-bottom: 1rem;
+}
+
+.modal-content h3 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.modal-content p {
+    margin-bottom: 2rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0.6; }
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .register-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .main-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .register-container {
+        padding: 1rem 0;
+    }
+    
+    .register-content {
+        padding: 0 1rem;
+    }
+    
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .header-subtitle {
+        font-size: 1rem;
+    }
+    
+    .panel-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .steps-container,
+    .camera-section,
+    .form-section,
+    .preview-section {
+        padding: 1.5rem;
+    }
+    
+    .guide-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .guide-icon {
+        font-size: 2rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .preview-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .modal-content {
+        padding: 2rem;
+        margin: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='register.js') }}"></script>
+{% endblock %}

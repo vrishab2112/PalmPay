@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PalmPay - Welcome</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #009578;
+            --accent-color: #ffab00;
+            --danger-color: #e53935;
+            --light-bg: #f9f9f9;
+            --text-color: #333;
+            --font-main: 'Poppins', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: var(--font-main);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .welcome-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .logo-section p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .selection-cards {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .selection-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 300px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .selection-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .selection-card i {
+            font-size: 3.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .selection-card h2 {
+            font-size: 1.8rem;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .selection-card p {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .selection-card .btn {
+            background: linear-gradient(135deg, var(--primary-color), #007a63);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .selection-card .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,149,120,0.3);
+        }
+
+        /* Admin Login Modal */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), #007a63);
+            color: white;
+            border-radius: 16px 16px 0 0;
+            border: none;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-control {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,149,120,0.1);
+        }
+
+        .input-group-text {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px 0 0 8px;
+        }
+
+        @media (max-width: 768px) {
+            .selection-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .selection-card {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner-border {
+            width: 1.2rem;
+            height: 1.2rem;
+            border-width: 0.15em;
+            display: none;
+        }
+
+        .btn.loading .spinner-border {
+            display: inline-block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="logo-section">
+            <h1><i class="fas fa-hand-holding-usd me-2"></i>PalmPay</h1>
+            <p>The future of secure payments is in the palm of your hand</p>
+        </div>
+
+        <div class="selection-cards">
+            <div class="selection-card">
+                <i class="fas fa-user"></i>
+                <h2>User</h2>
+                <p>Access your wallet and make secure payments using your palm print</p>
+                <button class="btn" onclick="showUserChoiceModal()">
+                    <span class="btn-text">
+                        <i class="fas fa-arrow-right me-2"></i>Continue as User
+                    </span>
+                </button>
+            </div>
+            <div class="selection-card">
+                <i class="fas fa-user-shield"></i>
+                <h2>Admin</h2>
+                <p>Manage users, transactions, and system settings</p>
+                <button class="btn" onclick="showAdminLogin()">
+                    <span class="btn-text">
+                        <i class="fas fa-arrow-right me-2"></i>Login as Admin
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="modal fade" id="adminLoginModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Admin Login</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                        <div class="mb-4">
+                            <label for="adminUsername" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" id="adminUsername" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="adminPassword" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="adminPassword" required>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="adminLoginBtn">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                <span class="btn-text">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Choice Modal -->
+    <div class="modal fade" id="userChoiceModal" tabindex="-1" aria-labelledby="userChoiceModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="userChoiceModalLabel">Welcome! Choose an option</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <button class="btn btn-primary btn-lg w-100 mb-3" onclick="showLoginModal()">
+              <i class="fas fa-sign-in-alt me-2"></i> Log In
+            </button>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg w-100">
+              <i class="fas fa-user-plus me-2"></i> Sign Up
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">User Login</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="loginForm">
+              <div class="mb-3">
+                <label for="loginName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="loginName" required>
+              </div>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginPassword" required>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Log In</button>
+              </div>
+            </form>
+            <div id="loginError" class="text-danger mt-3" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showUserChoiceModal() {
+            var modal = new bootstrap.Modal(document.getElementById('userChoiceModal'));
+            modal.show();
+        }
+        function showAdminLogin() {
+            const modal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
+            modal.show();
+        }
+        function showLoginModal() {
+            var modal = new bootstrap.Modal(document.getElementById('loginModal'));
+            modal.show();
+        }
+        document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('loginName').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            // Call login API
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, password })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                localStorage.setItem('loggedInUser', name);
+                window.location.href = '/recharge';
+            } else {
+                errorDiv.textContent = data.error || 'Invalid credentials';
+                errorDiv.style.display = 'block';
+            }
+        });
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            
+            // Show loading state
+            const btn = document.getElementById('adminLoginBtn');
+            btn.classList.add('loading');
+            
+            // Store admin type and redirect after a short delay
+            localStorage.setItem('userType', 'admin');
+            setTimeout(() => {
+                window.location.href = '/admin';
+            }, 500);
+        }
+
+        // Clear previous selection when landing on this page
+        document.addEventListener('DOMContentLoaded', function() {
+            localStorage.removeItem('userType');
+        });
+    </script>
+</body>
+</html> 

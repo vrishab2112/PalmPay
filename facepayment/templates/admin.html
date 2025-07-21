@@ -1,0 +1,319 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard fade-in">
+    <!-- Stats Overview -->
+    <div class="admin-stats shadow">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3>{{ users|length }}</h3>
+                    <p class="mb-0">Total Users</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3>{{ transactions|length }}</h3>
+                    <p class="mb-0">Total Transactions</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3><span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>{{ transactions|sum(attribute='2') }}</h3>
+                    <p class="mb-0">Total Volume</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-item">
+                    <h3>{{ users|selectattr('2', '>', 0)|list|length }}</h3>
+                    <p class="mb-0">Active Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Users Management -->
+        <div class="col-md-6 mb-4">
+            <div class="card admin-card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Users
+                    </h5>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fas fa-plus me-1"></i>Add User
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Balance</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user[0] }}</td>
+                                    <td>{{ user[1] }}</td>
+                                    <td><span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>{{ user[2] }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-info me-1" 
+                                                    onclick="viewUserDetails({{ user[0] }}, '{{ user[1] }}', {{ user[2] }})"
+                                                    title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning me-1" 
+                                                    onclick="editUser({{ user[0] }}, '{{ user[1] }}', {{ user[2] }})"
+                                                    title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form action="{{ url_for('admin_delete_user', user_id=user[0]) }}" 
+                                                  method="POST" class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions -->
+        <div class="col-md-6 mb-4">
+            <div class="card admin-card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i>Recent Transactions
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                <tr>
+                                    <td>{{ transaction[0] }}</td>
+                                    <td>{{ transaction[1] }}</td>
+                                    <td class="{{ 'text-success' if transaction[2] > 0 else 'text-danger' }}">
+                                        {{ '<span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>' + transaction[2]|string if transaction[2] > 0 else '-<span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>' + (-transaction[2])|string }}
+                                    </td>
+                                    <td>{{ transaction[3] }}</td>
+                                    <td>
+                                        <form action="{{ url_for('admin_delete_transaction', transaction_id=transaction[0]) }}" 
+                                              method="POST" class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this transaction?')">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('admin_add_user') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="balance" class="form-label">Initial Balance</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>
+                            <input type="number" class="form-control" id="balance" name="balance" 
+                                   value="1000" min="0" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editUserForm" action="" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editBalance" class="form-label">Balance</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>
+                            <input type="number" class="form-control" id="editBalance" name="balance" 
+                                   min="0" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-user me-2"></i>User Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">User Information</h6>
+                        <p><strong>ID:</strong> <span id="detailUserId"></span></p>
+                        <p><strong>Name:</strong> <span id="detailUserName"></span></p>
+                        <p><strong>Current Balance:</strong> <span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span><span id="detailUserBalance"></span></p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <button class="btn btn-warning me-2" id="detailEditBtn">
+                            <i class="fas fa-edit me-1"></i>Edit User
+                        </button>
+                        <form id="detailDeleteForm" method="POST" class="d-inline"
+                              onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Delete User
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <h6 class="text-muted mb-3">Recent Transactions</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="userTransactionsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Transactions will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function editUser(id, name, balance) {
+    const form = document.getElementById('editUserForm');
+    form.action = `/admin/user/update/${id}`;
+    document.getElementById('editName').value = name;
+    document.getElementById('editBalance').value = balance;
+    new bootstrap.Modal(document.getElementById('editUserModal')).show();
+}
+
+function viewUserDetails(id, name, balance) {
+    // Update user info
+    document.getElementById('detailUserId').textContent = id;
+    document.getElementById('detailUserName').textContent = name;
+    document.getElementById('detailUserBalance').textContent = balance;
+    
+    // Update action buttons
+    document.getElementById('detailEditBtn').onclick = () => {
+        bootstrap.Modal.getInstance(document.getElementById('userDetailsModal')).hide();
+        editUser(id, name, balance);
+    };
+    document.getElementById('detailDeleteForm').action = `/admin/user/delete/${id}`;
+    
+    // Filter transactions for this user
+    const transactionsTable = document.getElementById('userTransactionsTable').getElementsByTagName('tbody')[0];
+    transactionsTable.innerHTML = '';
+    
+    // Add user's transactions
+    {% for t in transactions %}
+    if ('{{ t[1] }}' === name) {
+        const row = transactionsTable.insertRow();
+        const amount = {{ t[2] }};
+        const amountDisplay = amount > 0 ? 
+            `<span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>${amount}` : 
+            `-<span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span>${Math.abs(amount)}`;
+        const amountClass = amount > 0 ? 'text-success' : 'text-danger';
+        
+        row.innerHTML = `
+            <td>{{ t[0] }}</td>
+            <td class="${amountClass}">${amountDisplay}</td>
+            <td>{{ t[3] }}</td>
+            <td>
+                <form action="{{ url_for('admin_delete_transaction', transaction_id=t[0]) }}" 
+                      method="POST" class="d-inline"
+                      onsubmit="return confirm('Are you sure you want to delete this transaction?')">
+                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+        `;
+    }
+    {% endfor %}
+    
+    // Show modal
+    new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+}
+</script>
+{% endblock %}

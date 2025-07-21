@@ -1,0 +1,957 @@
+{% extends "layout.html" %}
+
+{% block title %}Checkout - PalmPay{% endblock %}
+
+{% block content %}
+<!-- Define SVG as a template string for reuse -->
+{% set coin_svg %}
+<svg class="coin-w" width="22" height="22" viewBox="0 0 32 32" style="vertical-align:middle;">
+  <defs>
+    <radialGradient id="gold" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fffbe6"/>
+      <stop offset="60%" stop-color="#ffe066"/>
+      <stop offset="100%" stop-color="#ffd700"/>
+    </radialGradient>
+  </defs>
+  <circle cx="16" cy="16" r="15" fill="url(#gold)" stroke="#bfa100" stroke-width="2"/>
+  <text x="16" y="21" text-anchor="middle" font-size="16" font-family="Arial Black,Arial,sans-serif" fill="#bfa100" font-weight="bold">W</text>
+</svg>
+{% endset %}
+
+{# Replace all occurrences of the old coin+W span with the SVG #}
+{# Example: #}
+{# <span style="color:#ffd700; font-size:1.1rem;">&#x1F4B0;<b>W</b></span> #}
+
+{# Cart Items, Cart Summary, Payment Button, User Info, etc. #}
+
+{# Replace in cart items #}
+{{ coin_svg|safe }}<span id="price1">25</span>
+# ...and so on for all other occurrences, replacing the old span with {{ coin_svg|safe }}
+
+<div class="checkout-container">
+    <!-- Header Section -->
+    <div class="checkout-header">
+        <div class="header-content">
+            <h1 class="main-title">
+                <i class="fas fa-shopping-cart"></i>
+                Secure Checkout
+            </h1>
+            <p class="header-subtitle">Complete your purchase with biometric authentication</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="checkout-content">
+        <div class="checkout-grid">
+            <!-- Left Panel - Shopping Cart -->
+            <div class="cart-panel">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-shopping-bag"></i> Your Cart</h2>
+                        <span class="cart-count">4 items</span>
+                    </div>
+                    
+                    <div class="cart-items">
+                        <div class="cart-item">
+                            <div class="item-image">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>Premium Cotton T-Shirt</h3>
+                                <p class="item-description">Comfortable 100% cotton t-shirt</p>
+                                <div class="item-meta">
+                                    <span class="item-size">Size: L</span>
+                                    <span class="item-color">Color: Blue</span>
+                                </div>
+                            </div>
+                            <div class="item-price">
+                                {{ coin_svg|safe }}<span id="price1">25</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateQuantity(1, -1)">-</button>
+                                    <span class="quantity">1</span>
+                                    <button class="qty-btn" onclick="updateQuantity(1, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cart-item">
+                            <div class="item-image">
+                                <i class="fas fa-shoe-prints"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>Running Shoes</h3>
+                                <p class="item-description">Lightweight athletic running shoes</p>
+                                <div class="item-meta">
+                                    <span class="item-size">Size: 10</span>
+                                    <span class="item-color">Color: Black</span>
+                                </div>
+                            </div>
+                            <div class="item-price">
+                                {{ coin_svg|safe }}<span id="price2">90</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateQuantity(2, -1)">-</button>
+                                    <span class="quantity">1</span>
+                                    <button class="qty-btn" onclick="updateQuantity(2, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cart-item">
+                            <div class="item-image">
+                                <i class="fas fa-headphones"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>Wireless Headphones</h3>
+                                <p class="item-description">High-quality Bluetooth headphones</p>
+                                <div class="item-meta">
+                                    <span class="item-size">Model: Pro</span>
+                                    <span class="item-color">Color: White</span>
+                                </div>
+                            </div>
+                            <div class="item-price">
+                                {{ coin_svg|safe }}<span id="price3">120</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateQuantity(3, -1)">-</button>
+                                    <span class="quantity">1</span>
+                                    <button class="qty-btn" onclick="updateQuantity(3, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cart-item">
+                            <div class="item-image">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>Phone Case</h3>
+                                <p class="item-description">Durable protective phone case</p>
+                                <div class="item-meta">
+                                    <span class="item-size">Size: Universal</span>
+                                    <span class="item-color">Color: Clear</span>
+                                </div>
+                            </div>
+                            <div class="item-price">
+                                {{ coin_svg|safe }}<span id="price4">50</span>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateQuantity(4, -1)">-</button>
+                                    <span class="quantity">1</span>
+                                    <button class="qty-btn" onclick="updateQuantity(4, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="cart-summary">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">{{ coin_svg|safe }}<span id="subtotalAmount">285</span></span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax (8.5%)</span>
+                            <span id="tax">{{ coin_svg|safe }}<span id="taxAmount">24</span></span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="shipping">{{ coin_svg|safe }}<span id="shippingAmount">10</span></span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span id="total">{{ coin_svg|safe }}<span id="totalAmount">319</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Payment -->
+            <div class="payment-panel">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-credit-card"></i> Payment Method</h2>
+                    </div>
+                    
+                    <!-- Payment Methods -->
+                    <div class="payment-methods">
+                        <div class="payment-option active">
+                            <div class="payment-icon">
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                            <div class="payment-info">
+                                <h4>Palm Authentication</h4>
+                                <p>Secure biometric payment with your palm</p>
+                            </div>
+                            <div class="payment-check">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Palm Verification Section -->
+                    <div class="palm-verification">
+                        <div class="verification-header">
+                            <h3><i class="fas fa-hand-paper"></i> Palm Verification</h3>
+                            <p>Place your palm in the circle below for secure authentication</p>
+                        </div>
+
+                        <!-- Camera Feed -->
+                        <div class="camera-container">
+                            <div class="video-wrapper">
+                                <video id="videoElement" autoplay muted></video>
+                                <canvas id="canvas" style="display: none;"></canvas>
+                                
+                                <!-- Camera Overlay -->
+                                <div class="camera-overlay">
+                                    <div class="capture-guide">
+                                        <div class="guide-circle">
+                                            <div class="guide-icon">
+                                                <i class="fas fa-hand-paper"></i>
+                                            </div>
+                                        </div>
+                                        <div class="guide-text">Place your palm in the circle</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Camera Status -->
+                                <div class="camera-status">
+                                    <span id="statusIndicator">
+                                        <i class="fas fa-circle"></i>
+                                        <span>Initializing camera...</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Info (shown after verification) -->
+                        <div id="userInfo" class="user-info" style="display: none;">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-details">
+                                <h4 id="userName">John Doe</h4>
+                                <p>Current Balance: {{ coin_svg|safe }}<span id="currentBalance">1000</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Payment Button -->
+                        <div class="payment-actions">
+                            <button id="verifyButton" class="btn-verify" onclick="verifyPalm()">
+                                <i class="fas fa-hand-paper"></i>
+                                <span>Verify Palm</span>
+                            </button>
+                            <button id="payButton" class="btn-pay" onclick="processPayment()" style="display: none;">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Pay {{ coin_svg|safe }}<span id="payAmount">319</span></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div id="loadingModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+        <h3>Processing Payment</h3>
+        <p>Please wait while we verify your palm and process the payment...</p>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content success-modal">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Payment Successful!</h3>
+        <div class="success-details">
+            <p><strong>Customer:</strong> <span id="successCustomer"></span></p>
+            <p><strong>Amount Paid:</strong> {{ coin_svg|safe }}<span id="successAmount">319</span></p>
+            <p><strong>New Balance:</strong> {{ coin_svg|safe }}<span id="successBalance">1000</span></p>
+            <p><strong>Order ID:</strong> <span id="orderId"></span></p>
+        </div>
+        <p class="success-message">Your order has been confirmed and will be shipped soon!</p>
+        <button class="btn-primary" onclick="window.location.href='/'">
+            <i class="fas fa-home"></i>
+            Continue Shopping
+        </button>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content error-modal">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <h3>Payment Failed</h3>
+        <p id="errorMessage">An error occurred during payment. Please try again.</p>
+        <button class="btn-primary" onclick="closeErrorModal()">
+            <i class="fas fa-times"></i>
+            Close
+        </button>
+    </div>
+</div>
+
+<style>
+/* Checkout Page Specific Styles */
+.checkout-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+}
+
+.checkout-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: white;
+}
+
+.main-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.main-title i {
+    margin-right: 1rem;
+    color: #ffd700;
+}
+
+.header-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.checkout-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Panel Cards */
+.panel-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+}
+
+.panel-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.panel-header i {
+    margin-right: 0.5rem;
+    color: #ffd700;
+}
+
+.cart-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Cart Items */
+.cart-items {
+    padding: 2rem;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.item-image i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.item-details {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.item-details h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.item-description {
+    margin: 0 0 0.5rem 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.item-meta {
+    display: flex;
+    gap: 1rem;
+}
+
+.item-size, .item-color {
+    background: #f8f9fa;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.item-price {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.qty-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #e0e0e0;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.qty-btn:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.quantity {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Cart Summary */
+.cart-summary {
+    padding: 2rem;
+    border-top: 1px solid #e0e0e0;
+    background: #f8f9fa;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.summary-row.total {
+    border-top: 2px solid #e0e0e0;
+    padding-top: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Payment Methods */
+.payment-methods {
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-option.active {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.payment-option:hover {
+    border-color: #667eea;
+}
+
+.option-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.option-icon i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.option-details {
+    flex: 1;
+}
+
+.option-details h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.option-details p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.option-check {
+    color: #667eea;
+    font-size: 1.5rem;
+}
+
+/* Palm Verification */
+.palm-verification {
+    padding: 2rem;
+}
+
+/* Camera Container */
+.camera-container {
+    margin-bottom: 2rem;
+}
+
+.video-wrapper {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 4/3;
+}
+
+#videoElement {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.capture-guide {
+    text-align: center;
+}
+
+.guide-circle {
+    width: 150px;
+    height: 150px;
+    border: 3px dashed rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.guide-icon {
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.guide-text {
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.camera-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+#statusIndicator i {
+    color: #4CAF50;
+    margin-right: 0.5rem;
+    animation: blink 1.5s infinite;
+}
+
+.verification-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.verification-header h3 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.verification-header p {
+    margin: 0;
+    color: #666;
+}
+
+
+
+/* User Info */
+.user-info {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.user-avatar i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.user-details h4 {
+    margin: 0 0 0.25rem 0;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.user-details p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Payment Actions */
+.payment-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-verify, .btn-pay {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 150px;
+    justify-content: center;
+}
+
+.btn-verify {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-verify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+.btn-pay {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.btn-pay:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+}
+
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.loading-spinner {
+    margin-bottom: 2rem;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+.success-modal .success-icon {
+    font-size: 4rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.error-modal .error-icon {
+    font-size: 4rem;
+    color: #f44336;
+    margin-bottom: 1rem;
+}
+
+.success-details {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.success-details p {
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+.success-message {
+    margin: 1.5rem 0;
+    color: #666;
+    font-style: italic;
+}
+
+.modal-content h3 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.modal-content p {
+    margin-bottom: 2rem;
+    color: #666;
+    line-height: 1.5;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0.6; }
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .checkout-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .main-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 1rem 0;
+    }
+    
+    .checkout-content {
+        padding: 0 1rem;
+    }
+    
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .header-subtitle {
+        font-size: 1rem;
+    }
+    
+    .panel-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .cart-items,
+    .payment-methods,
+    .palm-verification {
+        padding: 1.5rem;
+    }
+    
+    .cart-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .item-price {
+        margin-top: 1rem;
+        align-items: center;
+    }
+    
+    .guide-circle {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .guide-icon {
+        font-size: 2rem;
+    }
+    
+    .payment-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        padding: 2rem;
+        margin: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='payment.js') }}"></script>
+{% endblock %}

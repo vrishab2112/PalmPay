@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to PalmPay</h1>
+    <p>The future of secure payments is in the palm of your hand</p>
+</div>
+
+<div class="action-buttons" style="text-align:center; margin-bottom:40px;">
+    <div class="card" style="display:inline-block; padding:2rem 3rem; border-radius:20px; box-shadow:0 8px 32px rgba(0,0,0,0.12); background:white;">
+        <h2 class="mb-4">Get Started</h2>
+        <button class="btn btn-success btn-lg" style="font-size:1.3rem; padding:1rem 2.5rem;" onclick="showUserChoiceModal()">
+            <i class="fas fa-user me-2"></i> Continue as User
+        </button>
+    </div>
+</div>
+
+<!-- User Choice Modal -->
+<div class="modal fade" id="userChoiceModal" tabindex="-1" aria-labelledby="userChoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userChoiceModalLabel">Welcome! Choose an option</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <button class="btn btn-primary btn-lg w-100 mb-3" onclick="showLoginModal()">
+          <i class="fas fa-sign-in-alt me-2"></i> Log In
+        </button>
+        <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg w-100">
+          <i class="fas fa-user-plus me-2"></i> Sign Up
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">User Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="loginName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="loginName" required>
+          </div>
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="loginPassword" required>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Log In</button>
+          </div>
+        </form>
+        <div id="loginError" class="text-danger mt-3" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="features">
+    <div class="feature">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Secure</h3>
+        <p>Your palm print is unique and can't be stolen or duplicated</p>
+    </div>
+    <div class="feature">
+        <i class="fas fa-bolt"></i>
+        <h3>Fast</h3>
+        <p>Complete payments in seconds with just a scan</p>
+    </div>
+    <div class="feature">
+        <i class="fas fa-hand-paper"></i>
+        <h3>Convenient</h3>
+        <p>No cards, no phones - just your palm</p>
+    </div>
+</div>
+
+<style>
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+.hero h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #00c6ff, #92fe9d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.features {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.feature {
+    flex: 1;
+    min-width: 250px;
+    max-width: 350px;
+    text-align: center;
+    padding: 30px;
+    background: rgba(0, 15, 30, 0.85);
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+}
+
+.feature i {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #00c6ff, #92fe9d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.feature h3 {
+    color: #00c6ff;
+    margin-bottom: 15px;
+}
+
+.feature p {
+    color: #a0d2ff;
+    line-height: 1.6;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showUserChoiceModal() {
+    var modal = new bootstrap.Modal(document.getElementById('userChoiceModal'));
+    modal.show();
+}
+
+function showLoginModal() {
+    var modal = new bootstrap.Modal(document.getElementById('loginModal'));
+    modal.show();
+}
+
+document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('loginName').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginError');
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+    // Call login API
+    const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+        window.location.href = '/recharge';
+    } else {
+        errorDiv.textContent = data.error || 'Invalid credentials';
+        errorDiv.style.display = 'block';
+    }
+});
+</script>
+{% endblock %} 
