@@ -59,7 +59,7 @@ All token/currency displays use a custom SVG gold coin with a 'W' in the center 
 ## Credits
 - Palm recognition: [MediaPipe](https://mediapipe.dev/), [PyTorch](https://pytorch.org/)
 - UI: [Bootstrap](https://getbootstrap.com/), [FontAwesome](https://fontawesome.com/)
-- Project by [Your Name]
+- Project by Vrishab Vishnu
 
 ---
 For any issues or contributions, please open an issue or pull request. 
