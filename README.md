@@ -19,7 +19,7 @@ PalmPay is a modern, secure, and user-friendly palm-based payment web applicatio
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/vrishab2112/PalmPay
 cd facepayment (1)/facepayment
 ```
 
@@ -59,7 +59,7 @@ All token/currency displays use a custom SVG gold coin with a 'W' in the center 
 ## Credits
 - Palm recognition: [MediaPipe](https://mediapipe.dev/), [PyTorch](https://pytorch.org/)
 - UI: [Bootstrap](https://getbootstrap.com/), [FontAwesome](https://fontawesome.com/)
-- Project by Vrishab Vishnu
+- Project by Vrishab Vishnu & Shreya S Dudhani
 
 ---
 For any issues or contributions, please open an issue or pull request. 
